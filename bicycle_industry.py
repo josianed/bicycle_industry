@@ -12,4 +12,7 @@ class Bike_Shops(object):
         # where each key is a model name, with a value representing stock
 
 class Customers(object):
-    def __init__(self, name, fund, )
+    def __init__(self, name, fund):
+        self.name = name
+        self.fund = fund
+        self.ownsBike = False
