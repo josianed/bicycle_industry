@@ -25,7 +25,8 @@ def main_menu_options(choice):
         current_choice = bicycle_menu()
         bicycle_menu_options(current_choice)
     elif (choice == "2"):
-        print("2 selected")
+        current_choice = shop_menu()
+        shop_menu_options(current_choice)
     elif (choice == "3"):
         print("3 selected")
     elif (choice == "4"):
@@ -79,18 +80,60 @@ def create_new_bicycle():
     bicycle_list.append(new_bike)
     print("New bicycle model {} successfully created.".format(model_name))
 
+def shop_menu():
+    print()
+    print(" ----- Bike Shops ----- ")
+    print("[1] See existing bike shops")
+    print("[2] Open new bike shop")
+    print("[3] Return to main menu")
+    print()
+    shop_menu_choice = input("Please select an option from the above menu: ")
+    return shop_menu_choice
+
+def shop_menu_options(choice):
+    if (choice == "1"):
+        show_bike_shop_list()
+        current_choice = shop_menu()
+        shop_menu_options(current_choice)
+    elif (choice == "2"):
+        create_new_bike_shop()
+        current_choice = shop_menu()
+        shop_menu_options(current_choice)
+    elif (choice == "3"):
+        current_choice = main_menu()
+        main_menu_options(current_choice)
+    else:
+        current_choice = shop_menu()
+        shop_menu_options(current_choice)
+
+bike_shop_list = [] #list of bicycles created by user
+def show_bike_shop_list():
+    if bike_shop_list:
+        print("Current bike shops in your area: ")
+        print()
+        for shop in bike_shop_list:
+            shop.see_shops()
+    else:
+        print("There are currently no bike shops in your area.")
+
+def create_new_bike_shop():
+    shop_name = input("Please enter the new bicycle model's name: ")
+    margin = input("Please enter your shop's margin in %: ")
+    new_shop = Bike_Shop(shop_name, margin)
+    bike_shop_list.append(new_shop)
+    print("New bike shop {} successfully created.".format(shop_name))
+    print("Now, let's order some inventory.")
+    show_bicycle_list()
+    inventory = input("Please select which bicycle models you would like to stock: ")
+    print("Select the number of the model: ")
+    print("How many would you like to purchase for your inventory? ")
+    # print("Confirm purchase of {} bicycles of model {} for {}".format(amount, bike_model, cost))
 
 class Bicycle(object):
     def __init__(self, name, weight, production_cost):
         self.name = name
         self.weight = weight
         self.production_cost = production_cost
-
-
-    # bicycle_list = [] #list of bicycles created by user
-    # def save_bike(Bicycle):
-    #     '''Saves a newly created bicycle to the bicycle list'''
-    #     bicycle_list.append(Bicycle)
 
     def see_bike(self):
         ''' Displays a bike's attributes'''
@@ -112,10 +155,9 @@ class Bike_Shop(object):
             '''Saves newly created shop to the shop list'''
             shop_list.append(Bike_Shop)
 
-        def see_shops():
+        def see_shops(self):
             '''Displays all shops that were opened'''
-            for shop in shop_list.items():
-                print(shop, sep=", ")
+            print("{} has a margin of {}.".format(self.name, self.margin))
 
         store_inventory = {} #list of stock available (models + amount)
         def add_inventory(self, Bicycle, amount):
