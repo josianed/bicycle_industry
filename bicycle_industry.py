@@ -9,18 +9,21 @@ def main():
 
 
 def main_menu():
+    print()
     print(" ----- Main Menu ----- ")
     print("[1] Order bicycles from manufacturer")
     print("[2] Open Bike Shop")
     print("[3] Meet customers")
     print("[4] Go shopping for a new bicycle")
     print("[5] Exit")
+    print()
     main_menu_choice = input("Please select an option from the above menu: ")
     return main_menu_choice
 
 def main_menu_options(choice):
     if (choice == "1"):
-        print("1 selected")
+        current_choice = bicycle_menu()
+        bicycle_menu_options(current_choice)
     elif (choice == "2"):
         print("2 selected")
     elif (choice == "3"):
@@ -32,7 +35,28 @@ def main_menu_options(choice):
     else:
         main_menu()
 
+def bicycle_menu():
+    print()
+    print(" ----- Bicycle Manufacturer ----- ")
+    print("[1] See existing bicycle models")
+    print("[2] Order new bicycle model")
+    print("[3] Return to main menu")
+    print()
+    bicycle_menu_choice = input("Please select an option from the above menu: ")
+    return bicycle_menu_choice
+
+def bicycle_menu_options(choice):
+    if (choice == "1"):
+        print("1 selected")
+    elif (choice == "2"):
+        print("2 selected")
+    elif (choice == "3"):
+        print("3 selected")
+    else:
+        bicycle_menu()
+
 # def create_new_bicycle():
+
 
 
     class Bicycle(object):
