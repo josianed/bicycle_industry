@@ -1,7 +1,6 @@
 import sys
 
 def main():
-
     print("Welcome. What would you like to do today?")
     current_choice = main_menu()
     main_menu_options(current_choice)
@@ -67,15 +66,17 @@ def show_bicycle_list():
     if bicycle_list:
         print("Current bicycle models: ")
         print()
-        for bicycle in bicycle_list:
+        for position, bicycle in enumerate(bicycle_list):
+            print("[{}]".format(position + 1))
             bicycle.see_bike()
+            print()
     else:
         print("There are currently no bicycles available to view.")
 
 def create_new_bicycle():
     model_name = input("Please enter the new bicycle model's name: ")
     model_weight = input("Please enter the new bicycle's weight: ")
-    prod_cost = input("Please enter the new bicycle's production cost: ")
+    prod_cost = int(input("Please enter the new bicycle's production cost: "))
     new_bike = Bicycle(model_name, model_weight, prod_cost)
     bicycle_list.append(new_bike)
     print("New bicycle model {} successfully created.".format(model_name))
@@ -109,25 +110,36 @@ def shop_menu_options(choice):
 bike_shop_list = [] #list of bicycles created by user
 def show_bike_shop_list():
     if bike_shop_list:
+        print()
         print("Current bike shops in your area: ")
         print()
         for shop in bike_shop_list:
+            print(index.bike_shop_list(shop))
             shop.see_shops()
     else:
         print("There are currently no bike shops in your area.")
 
 def create_new_bike_shop():
-    shop_name = input("Please enter the new bicycle model's name: ")
+    shop_name = input("Please enter the new bike shop's name: ")
     margin = input("Please enter your shop's margin in %: ")
     new_shop = Bike_Shop(shop_name, margin)
     bike_shop_list.append(new_shop)
     print("New bike shop {} successfully created.".format(shop_name))
+    print()
     print("Now, let's order some inventory.")
     show_bicycle_list()
-    inventory = input("Please select which bicycle models you would like to stock: ")
-    print("Select the number of the model: ")
-    print("How many would you like to purchase for your inventory? ")
-    # print("Confirm purchase of {} bicycles of model {} for {}".format(amount, bike_model, cost))
+    model_number = int(input("Please select the number of the model you would like to stock: "))
+    model_index = model_number - 1
+    amount = input("How many would you like to purchase for your inventory? ")
+    new_shop.add_to_inventory(bicycle_list[model_index], amount)
+    print("Successfully purchased {} bicycles of model {} for ${} each".format(amount, model_index, bicycle_list[model_index].production_cost))
+    print("Current inventory: ")
+    new_shop.check_inventory()
+    current_choice = main_menu()
+    main_menu_options(current_choice)
+
+
+
 
 class Bicycle(object):
     def __init__(self, name, weight, production_cost):
@@ -137,7 +149,7 @@ class Bicycle(object):
 
     def see_bike(self):
         ''' Displays a bike's attributes'''
-        print("{} weighs {} lbs and costs {} to produce.".format(self.name, self.weight, self.production_cost))
+        print("Model {} weighs {} lbs and costs ${} to produce.".format(self.name, self.weight, self.production_cost))
 
 #Tests
 # bike1 = Bicycle("Vanquisher", 120, 300)
@@ -150,40 +162,40 @@ class Bike_Shop(object):
         self.profit = 0
         self.inventory = {}
 
-        shop_list = [] #list of shops created by user
-        def save_shop(Bike_Shop):
-            '''Saves newly created shop to the shop list'''
-            shop_list.append(Bike_Shop)
+    shop_list = [] #list of shops created by user
+    def save_shop(Bike_Shop):
+        '''Saves newly created shop to the shop list'''
+        shop_list.append(Bike_Shop)
 
-        def see_shops(self):
-            '''Displays all shops that were opened'''
-            print("{} has a margin of {}.".format(self.name, self.margin))
+    def see_shops(self):
+        '''Displays all shops that were opened'''
+        print("{} has a margin of {}.".format(self.name, self.margin))
 
-        store_inventory = {} #list of stock available (models + amount)
-        def add_inventory(self, Bicycle, amount):
-            '''Adds a bicycle model and its amount to the store's inventory, and removes production cost from store profit'''
-            store_inventory[Bicycle.name] = amount
-            self.profit -= Bicycle.production_cost
+    # store_inventory = {} #list of stock available (models + amount)
+    def add_to_inventory(self, Bicycle, amount):
+        '''Adds a bicycle model and number to stock to the store's inventory, and removes production cost from store profit'''
+        self.inventory[Bicycle.name] = amount
+        self.profit -= Bicycle.production_cost
 
-        def check_inventory():
-            '''Displays all the bicycles in the store's inventory with their amount in stock'''
-            for bike, number in store_inventory.items():
-                print(bike, number, sep=": ")
+    def check_inventory(self):
+        '''Displays all the bicycles in the store's inventory with their amount in stock'''
+        for bike, number in self.inventory.items():
+            print(bike, number, sep=": ")
 
-        def price(self, Bicycle):
-            '''Calculates bicycle's price based on margin'''
-            purchase_cost = Bicycle.production_cost
-            sale_price = purchase_cost * (1 + margin)
-            return sale_price
+    def price(self, Bicycle):
+        '''Calculates bicycle's price based on margin'''
+        purchase_cost = Bicycle.production_cost
+        sale_price = purchase_cost * (1 + margin)
+        return sale_price
 
-        def calculate_profit(self, Bicycle):
-            '''Calculates profit from the current sale and adds it to the store's overall profit'''
-            current_profit = Bicycle.production_cost * margin
-            self.profit += current_profit
+    def calculate_profit(self, Bicycle):
+        '''Calculates profit from the current sale and adds it to the store's overall profit'''
+        current_profit = Bicycle.production_cost * margin
+        self.profit += current_profit
 
-        def check_profit(self):
-            '''Displays the store's current profit'''
-            print("Your store's current profit is {}.".format(self.profit))
+    def check_profit(self):
+        '''Displays the store's current profit'''
+        print("Your store's current profit is {}.".format(self.profit))
 
 #Tests
 # shop1 = Bike_Shop("Larry's Spokes and Wheels", 10)
@@ -201,7 +213,7 @@ class Customer(object):
         '''Saves a new customer to the customer list'''
         customer.append(Customer)
 
-    def meet_customers():
+    def meet_customers(self):
         '''Displays all the customers'''
         for customer in customers.items():
             print(customer, sep=", ")
