@@ -27,10 +27,12 @@ def main_menu_options(choice):
         current_choice = shop_menu()
         shop_menu_options(current_choice)
     elif (choice == "3"):
-        print("3 selected")
+        current_choice = customer_menu()
+        customer_menu_options(current_choice)
     elif (choice == "4"):
         print("4 selected")
     elif (choice == "5"):
+        print("Thanks for stopping by. Goodbye!")
         sys.exit()
     else:
         main_menu()
@@ -71,7 +73,7 @@ def show_bicycle_list():
             bicycle.see_bike()
             print()
     else:
-        print("There are currently no bicycles available to view.")
+        print("There are currently no bicycles available to view. Please visit manufacturer to place your orders.")
 
 def create_new_bicycle():
     model_name = input("Please enter the new bicycle model's name: ")
@@ -113,9 +115,9 @@ def show_bike_shop_list():
         print()
         print("Current bike shops in your area: ")
         print()
-        for shop in bike_shop_list:
-            print(index.bike_shop_list(shop))
-            shop.see_shops()
+        for position, shop in enumerate(bike_shop_list):
+            print("[{}]".format(position + 1))
+            bike_shop.see_shop()
     else:
         print("There are currently no bike shops in your area.")
 
@@ -126,19 +128,75 @@ def create_new_bike_shop():
     bike_shop_list.append(new_shop)
     print("New bike shop {} successfully created.".format(shop_name))
     print()
-    print("Now, let's order some inventory.")
+    print("Now, add some inventory.")
+    add_inventory(new_shop)
+    add_more = input("Add more inventory? ")
+    while add_more == "yes" or add_more == "Yes":
+        add_inventory(new_shop)
+        add_more = input("Add more inventory? ")
+    current_choice = shop_menu()
+    shop_menu_options(current_choice)
+
+def add_inventory(new_shop):
+    print("Place your order.")
     show_bicycle_list()
     model_number = int(input("Please select the number of the model you would like to stock: "))
     model_index = model_number - 1
-    amount = input("How many would you like to purchase for your inventory? ")
+    while model_index < 0 or model_index > len(bicycle_list):
+        model_number = int(input("Please select the number of the model you would like to stock: "))
+        model_index = model_number - 1
+    amount = int(input("How many would you like to purchase for your inventory? "))
     new_shop.add_to_inventory(bicycle_list[model_index], amount)
     print("Successfully purchased {} bicycles of model {} for ${} each".format(amount, model_index, bicycle_list[model_index].production_cost))
     print("Current inventory: ")
     new_shop.check_inventory()
-    current_choice = main_menu()
-    main_menu_options(current_choice)
+    print("Current profit: ")
+    new_shop.check_profit()
 
+def customer_menu():
+    print()
+    print(" ----- Customers ----- ")
+    print("[1] See existing customers")
+    print("[2] Greet new customer")
+    print("[3] Return to main menu")
+    print()
+    customer_menu_choice = input("Please select an option from the above menu: ")
+    return customer_menu_choice
 
+def customer_menu_options(choice):
+    if (choice == "1"):
+        show_customer_list()
+        current_choice = customer_menu()
+        customer_menu_options(current_choice)
+    elif (choice == "2"):
+        greet_customer()
+        current_choice = customer_menu()
+        customer_menu_options(current_choice)
+    elif (choice == "3"):
+        current_choice = main_menu()
+        main_menu_options(current_choice)
+    else:
+        current_choice = customer_menu()
+        customer_menu_options(current_choice)
+
+customers_list = [] #List of existing customers
+def show_customer_list():
+    if customers_list:
+        print()
+        print("List of existing customers: ")
+        print()
+        for position, customer in enumerate(customers_list):
+            print("[{}]".format(position + 1))
+            customer.meet_customers()
+    else:
+        print("No one in this area has shopped for bicycles before.")
+
+def greet_customer():
+    new_customer_name = input("Hello! What is your name? ")
+    budget = input("What is your budget? ")
+    new_customer = Customer(new_customer_name, budget)
+    customers_list.append(new_customer)
+    print("New customer {} successfully added.".format(new_customer_name))
 
 
 class Bicycle(object):
@@ -175,12 +233,12 @@ class Bike_Shop(object):
     def add_to_inventory(self, Bicycle, amount):
         '''Adds a bicycle model and number to stock to the store's inventory, and removes production cost from store profit'''
         self.inventory[Bicycle.name] = amount
-        self.profit -= Bicycle.production_cost
+        self.profit -= Bicycle.production_cost * amount
 
     def check_inventory(self):
         '''Displays all the bicycles in the store's inventory with their amount in stock'''
         for bike, number in self.inventory.items():
-            print(bike, number, sep=": ")
+            print("Model {}: {} units".format(bike, number))
 
     def price(self, Bicycle):
         '''Calculates bicycle's price based on margin'''
@@ -195,7 +253,7 @@ class Bike_Shop(object):
 
     def check_profit(self):
         '''Displays the store's current profit'''
-        print("Your store's current profit is {}.".format(self.profit))
+        print("Your store's current profit is ${}.".format(self.profit))
 
 #Tests
 # shop1 = Bike_Shop("Larry's Spokes and Wheels", 10)
@@ -208,15 +266,9 @@ class Customer(object):
         self.fund = fund
         self.bikes = []
 
-    customers = [] #List of customers
-    def save_customer(Customer):
-        '''Saves a new customer to the customer list'''
-        customer.append(Customer)
-
     def meet_customers(self):
-        '''Displays all the customers'''
-        for customer in customers.items():
-            print(customer, sep=", ")
+        '''Displays a customer's attributes'''
+        print("{}".format(self.name))
 
     def calculate_fund(self, Bike_Shop, Bicycle):
         '''Calculates remaining money in fund after a bicycle is purchased'''
