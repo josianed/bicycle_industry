@@ -1,5 +1,91 @@
 import sys
 
+class Bicycle(object):
+    def __init__(self, name, weight, production_cost):
+        self.name = name
+        self.weight = weight
+        self.production_cost = production_cost
+
+    def see_bike(self):
+        ''' Displays a bike's attributes'''
+        print("Model {} weighs {} lbs and costs ${} to produce.".format(self.name, self.weight, self.production_cost))
+
+class Bike_Shop(object):
+    def __init__(self, name, margin):
+        self.name = name
+        self.margin = margin/100
+        self.profit = 0
+        self.inventory = {}
+
+    shop_list = [] #list of shops created by user
+    def save_shop(Bike_Shop):
+        '''Saves newly created shop to the shop list'''
+        shop_list.append(Bike_Shop)
+
+    def see_shops(self):
+        '''Displays all shops that were opened'''
+        print("{} has a margin of {}%.".format(self.name, self.margin * 100))
+
+    # store_inventory = {} #list of stock available (models + amount)
+    def add_to_inventory(self, Bicycle, amount):
+        '''Adds a bicycle model and number to stock to the store's inventory, and removes production cost from store profit'''
+        self.inventory[Bicycle.name] = amount
+        self.profit -= Bicycle.production_cost * amount
+
+    def remove_from_inventory(self, Bicycle):
+        '''Removes a bicycle from inventory once it is purchased'''
+        stock_remaining = self.inventory[Bicycle.name]
+        self.inventory[Bicycle.name] = stock_remaining - 1
+
+    def check_inventory(self):
+        '''Displays all the bicycles in the store's inventory with their amount in stock'''
+        for bike, number in self.inventory.items():
+            print("Model {}: {} units".format(bike, number))
+
+    def price(self, Bicycle):
+        '''Calculates bicycle's price based on margin'''
+        purchase_cost = Bicycle.production_cost
+        sale_price = purchase_cost * (1 + self.margin)
+        return sale_price
+
+    def calculate_profit(self, Bicycle):
+        '''Calculates profit from the current sale and adds it to the store's overall profit'''
+        current_profit = Bicycle.production_cost * self.margin
+        self.profit += current_profit
+
+    def check_profit(self):
+        '''Displays the store's current profit'''
+        print("Your store's current profit is ${}.".format(self.profit))
+
+class Customer(object):
+    def __init__(self, name, fund):
+        self.name = name
+        self.fund = fund
+        self.bikes = []
+
+    def see_purchased_bikes(self):
+        '''Displays a list of bikes that the customer owns'''
+        for bike in self.bikes:
+            print("You currently own the following bicycles: ")
+            print("{}".format(bike, sep=", "))
+
+    def calculate_fund(self, Bike_Shop, Bicycle):
+        '''Calculates remaining money in fund after a bicycle is purchased'''
+        current_purchase = Bike_Shop.price(Bicycle)
+        print("Bike to purchase costs ${}".format(current_purchase))
+        self.fund -= current_purchase
+
+    def check_fund(self):
+        '''Display's the customer's current remaining fund'''
+        print("Your remaining fund is ${}".format(self.fund))
+        return self.fund
+
+    def purchase_bike(self, Bicycle):
+        '''Adds purchased bike to customer's personal bike list'''
+        self.bikes.append(Bicycle)
+
+
+
 def main():
     print("Welcome. What would you like to do today?")
     current_choice = main_menu()
@@ -63,7 +149,11 @@ def bicycle_menu_options(choice):
         current_choice = bicycle_menu()
         bicycle_menu_options(current_choice)
 
-bicycle_list = [] #list of bicycles created by user
+
+b1 = Bicycle("A", 20, 200)
+b2 = Bicycle("B", 14, 600)
+b3 = Bicycle("C", 9, 1500)
+bicycle_list = [b1, b2, b3] #list of bicycles created by user
 def show_bicycle_list():
     if bicycle_list:
         print("Current bicycle models: ")
@@ -109,8 +199,17 @@ def shop_menu_options(choice):
         current_choice = shop_menu()
         shop_menu_options(current_choice)
 
-bike_shop_list = [] #list of bicycles created by user
+
+bs1 = Bike_Shop("Bob's Bikes", 10)
+bs2 = Bike_Shop("Fixies", 7)
+bs3 = Bike_Shop("Speed Supreme", 27)
+bike_shop_list = [bs1, bs2, bs3] #list of bicycles created by user
 def show_bike_shop_list():
+    bs1.add_to_inventory(b1, 5)
+    bs1.add_to_inventory(b2, 5)
+    bs1.add_to_inventory(b3, 5)
+    bs2.add_to_inventory(b1, 15)
+    bs3.add_to_inventory(b3, 5)
     if bike_shop_list:
         print()
         print("Current bike shops in your area: ")
@@ -179,7 +278,12 @@ def customer_menu_options(choice):
         current_choice = customer_menu()
         customer_menu_options(current_choice)
 
-customers_list = {} #List of existing customers
+c1 = Customer("Kelsey Ryan", 300)
+c2 = Customer("Max Frost", 220)
+customers_list = {
+    "Kelsey Ryan": c1,
+    "Max Frost": c2,
+} #List of existing customers
 def show_customer_list():
     if customers_list:
         print()
@@ -197,7 +301,7 @@ def greet_customer():
 
 def shopping():
     shopper = identify_shopper()
-    money_left = customers_list[shopper].check_fund()
+    money_left = customers_list[shopper.name].check_fund()
     print("Which shop would you like to visit today?")
     purchase_info = choose_shop(money_left)
     shop = purchase_info[0]
@@ -211,26 +315,14 @@ def identify_shopper():
     shopper_name = input("Welcome! What is your name? ")
     if shopper_name in customers_list:
         print("Hello {}!".format(shopper_name))
-        current_shopper.append(shopper_name)
+        shopper = customers_list[shopper_name]
+        current_shopper.append(shopper)
     else:
         print("Looks like it's your first time visiting us.")
         greet_customer()
-        shopper_name = customers_list[shopper_name]
-        current_shopper.append(shopper_name)
-    return shopper_name
-
-def check_affordable_inventory(fund, shop):
-        '''Displays all the bicycles in the store's inventory that a customer can afford given their funds'''
-        purchasable_bikes = 0
-        for current_bike, number in shop.inventory.items():
-            for i in range(len(bicycle_list)):
-                bike_to_price = bicycle_list[i]
-                if shop.price(bike_to_price) < fund:
-                    print("Price: {}".format(shop.price(bike_to_price)))
-                    purchasable_bikes += 1
-                    print("Model {}: {} units".format(current_bike, number))
-        if purchasable_bikes == 0:
-            print("Sorry, the bicycles for sale at this shop exceed your budget. Please come again.")
+        shopper = customers_list[shopper_name]
+        current_shopper.append(shopper)
+    return shopper
 
 current_shop = [] #stores the name of the current shop
 def choose_shop(money_left):
@@ -247,14 +339,28 @@ def choose_shop(money_left):
     purchase_info = [shop_to_visit, money_left]
     return purchase_info
 
+def check_affordable_inventory(fund, shop):
+        '''Displays all the bicycles in the store's inventory that a customer can afford given their funds'''
+        purchasable_bikes = 0
+        for current_bike, number in shop.inventory.items():
+            for i in range(len(bicycle_list)):
+                bike_to_price = bicycle_list[i]
+                if shop.price(bike_to_price) < fund:
+                    print("Model {}: {} units".format(current_bike, number))
+                    print("Price: {}".format(shop.price(bike_to_price)))
+                    purchasable_bikes += 1
+        if purchasable_bikes == 0:
+            print("Sorry, the bicycles for sale at this shop exceed your budget. Please come again.")
+            shopping_menu()
+
 def shopping_menu():
     print()
     print("---- Shopping Menu ----")
     print("[1] Purchase another bicycle")
     print("[2] Done shopping for today - return to main menu")
     print()
-    shopping_menu_choice = int(input("What would you like to do?"))
-    return shopping_menu_choice
+    choice = input("Please select an option from the above menu: ")
+    return choice
 
 def shopping_menu_options(choice):
     if (choice == "1"):
@@ -262,6 +368,7 @@ def shopping_menu_options(choice):
         shopper = current_shopper[0]
         shop = purchase_info[0]
         money_left = purchase_info[1]
+        check_affordable_inventory(money_left, shop)
         purchase(shopper, shop, money_left)
         current_choice = shopping_menu()
         shopping_menu_options(current_choice)
@@ -275,120 +382,25 @@ def shopping_menu_options(choice):
 
 
 def purchase(shopper, shop, money_left):
-    check_affordable_inventory(money_left, shop)
+
     model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: ")
-    bike_purchased = shop.inventory[model_to_purchase]
-    print("Bike model {} costs {}".format(bike_purchased.name, shop.price(bike_purchased)))
-    shop.remove_from_inventory(bike_purchased)
-    shop.calculate_profit(bike_purchased)
-    shopper.purchase_bike(bike_purchased)
-    shopper.calculate_fund(shop_to_visit, bike_purchased)
+    for bicycle in bicycle_list:
+        if model_to_purchase == bicycle.name:
+            bike_to_purchase = bicycle
+    shop.remove_from_inventory(bike_to_purchase)
+    shop.calculate_profit(bike_to_purchase)
+    shopper.purchase_bike(bike_to_purchase)
+    print("Bike model {} successfully purchased.".format(bike_to_purchase.name))
+    shopper.calculate_fund(shop, bike_to_purchase)
     shopper.check_fund()
 
 def leave_shops():
     shop = current_shop[0]
     shop.check_profit()
 
-class Bicycle(object):
-    def __init__(self, name, weight, production_cost):
-        self.name = name
-        self.weight = weight
-        self.production_cost = production_cost
-
-    def see_bike(self):
-        ''' Displays a bike's attributes'''
-        print("Model {} weighs {} lbs and costs ${} to produce.".format(self.name, self.weight, self.production_cost))
-
-#Tests
-# bike1 = Bicycle("Vanquisher", 120, 300)
-# print("Model {} weighs {} lbs and cost {} to produce.".format(bike1.name, bike1.weight, bike1.production_cost))
-
-class Bike_Shop(object):
-    def __init__(self, name, margin):
-        self.name = name
-        self.margin = margin/100
-        self.profit = 0
-        self.inventory = {}
-
-    shop_list = [] #list of shops created by user
-    def save_shop(Bike_Shop):
-        '''Saves newly created shop to the shop list'''
-        shop_list.append(Bike_Shop)
-
-    def see_shops(self):
-        '''Displays all shops that were opened'''
-        print("{} has a margin of {}%.".format(self.name, self.margin * 100))
-
-    # store_inventory = {} #list of stock available (models + amount)
-    def add_to_inventory(self, Bicycle, amount):
-        '''Adds a bicycle model and number to stock to the store's inventory, and removes production cost from store profit'''
-        self.inventory[Bicycle.name] = amount
-        self.profit -= Bicycle.production_cost * amount
-
-    def remove_from_inventory(self, Bicycle):
-        '''Removes a bicycle from inventory once it is purchased'''
-        self.inventory[Bicycle.name] -= 1
-
-    def check_inventory(self):
-        '''Displays all the bicycles in the store's inventory with their amount in stock'''
-        for bike, number in self.inventory.items():
-            print("Model {}: {} units".format(bike, number))
 
 
-
-    def price(self, Bicycle):
-        '''Calculates bicycle's price based on margin'''
-        purchase_cost = Bicycle.production_cost
-        sale_price = purchase_cost * (1 + self.margin)
-        return sale_price
-
-    def calculate_profit(self, Bicycle):
-        '''Calculates profit from the current sale and adds it to the store's overall profit'''
-        current_profit = Bicycle.production_cost * margin
-        self.profit += current_profit
-
-    def check_profit(self):
-        '''Displays the store's current profit'''
-        print("Your store's current profit is ${}.".format(self.profit))
-
-#Tests
-# shop1 = Bike_Shop("Larry's Spokes and Wheels", 10)
-# print("{} has a margin of {}.".format(shop1.name, shop1.margin))
-
-
-class Customer(object):
-    def __init__(self, name, fund):
-        self.name = name
-        self.fund = fund
-        self.bikes = []
-
-    # def meet_customers(self):
-    #     '''Displays a customer's attributes'''
-    #     print("{}".format(self.name))
-
-    def see_purchased_bikes(self):
-        '''Displays a list of bikes that the customer owns'''
-        for bike in self.bikes:
-            print("You currently own the following bicycles: ")
-            print("{}".format(bike, sep=", "))
-
-    def calculate_fund(self, Bike_Shop, Bicycle):
-        '''Calculates remaining money in fund after a bicycle is purchased'''
-        current_purchase = Bike_Shop.price()
-        remaining_fund = self.fund - current_purchase
-        return remaining_fund
-
-    def check_fund(self):
-        '''Display's the customer's current remaining fund'''
-        print("Your remaining fund is {}.".format(self.fund))
-        return self.fund
-
-    def purchase_bike(self, Bicycle):
-        '''Adds purchased bike to customer's personal bike list'''
-        self.bikes.append(Bicycle)
-
-#Tests
-# customer1 = Customer("Bob", 500)
-# print("{} has ${} to spend on a new bike.".format(customer1.name, customer1.fund))
 if __name__ == '__main__':
     main()
+
+#Test data
