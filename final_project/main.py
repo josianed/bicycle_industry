@@ -111,10 +111,10 @@ def shop_menu_options(choice):
         current_choice = shop_menu()
         shop_menu_options(current_choice)
 
-bs1 = Bike_Shop("Bob's Bikes", 10)
-bs2 = Bike_Shop("Fixies", 7)
-bs3 = Bike_Shop("Speed Supreme", 27)
-bs4 = Bike_Shop("Spokes & Wheels", 18)
+bs1 = Bike_Shop("Bob's Bikes", 20)
+bs2 = Bike_Shop("Fixies", 15)
+bs3 = Bike_Shop("Speed Supreme", 30)
+bs4 = Bike_Shop("Spokes & Wheels", 25)
 bike_shop_list = [bs1, bs2, bs3] #list of bicycles created by user
 def show_bike_shop_list():
     bs1.add_to_inventory(b1, 5)
