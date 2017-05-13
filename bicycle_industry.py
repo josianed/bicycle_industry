@@ -55,7 +55,7 @@ class Bike_Shop(object):
 
     def check_profit(self):
         '''Displays the store's current profit'''
-        print("{} has a current profit is ${}.".format(self.name, self.profit))
+        print("{} has a current profit of ${}.".format(self.name, self.profit))
 
 class Customer(object):
     def __init__(self, name, fund):
@@ -67,7 +67,7 @@ class Customer(object):
         '''Displays a list of bikes that the customer owns'''
         for bike in self.bikes:
             print("You currently own the following bicycles: ")
-            print("{}".format(bike, sep=", "))
+            print("Model {}".format(bike.name, sep=", "))
 
     def calculate_fund(self, Bike_Shop, Bicycle):
         '''Calculates remaining money in fund after a bicycle is purchased'''
@@ -308,21 +308,21 @@ def shopping():
     current_choice = shopping_menu()
     shopping_menu_options(current_choice)
 
-current_shopper = [] #stores the current shopper
+current_shopper = ["shopper"] #stores the current shopper
 def identify_shopper():
     shopper_name = input("Welcome! What is your name? ")
     if shopper_name in customers_list:
         print("Hello {}!".format(shopper_name))
         shopper = customers_list[shopper_name]
-        current_shopper.append(shopper)
+        current_shopper[0] = shopper
     else:
         print("Looks like it's your first time visiting us.")
         greet_customer()
         shopper = customers_list[shopper_name]
-        current_shopper.append(shopper)
+        current_shopper[0] = shopper
     return shopper
 
-current_shop = [] #stores the current shop
+current_shop = ["shop"] #stores the current shop
 def choose_shop(money_left):
     show_bike_shop_list()
     print()
@@ -332,7 +332,7 @@ def choose_shop(money_left):
         shop_number = int(input("Please select the number of the shop you would like to visit: "))
         shop_index = shop_number - 1
     shop_to_visit = bike_shop_list[shop_index]
-    current_shop.append(shop_to_visit)
+    current_shop[0] = shop_to_visit
     print("Welcome to {}.".format(shop_to_visit.name))
     check_affordable_inventory(money_left, shop_to_visit)
     return shop_to_visit
@@ -378,6 +378,7 @@ def shopping_menu():
 def shopping_menu_options(choice):
     if (choice == "1"):
         shopper = current_shopper[0]
+        shopper.see_purchased_bikes()
         money_left = customers_list[shopper.name].check_fund()
         print("Which shop would you like to visit today?")
         shop = choose_shop(money_left)
