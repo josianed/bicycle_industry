@@ -395,5 +395,3 @@ def shopping_menu_options(choice):
 
 if __name__ == '__main__':
     main()
-
-#Test data
