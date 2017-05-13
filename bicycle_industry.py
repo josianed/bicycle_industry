@@ -55,7 +55,7 @@ class Bike_Shop(object):
 
     def check_profit(self):
         '''Displays the store's current profit'''
-        print("Your store's current profit is ${}.".format(self.profit))
+        print("{} has a current profit is ${}.".format(self.name, self.profit))
 
 class Customer(object):
     def __init__(self, name, fund):
@@ -90,8 +90,6 @@ def main():
     print("Welcome. What would you like to do today?")
     current_choice = main_menu()
     main_menu_options(current_choice)
-
-
 
 def main_menu():
     print()
@@ -149,7 +147,6 @@ def bicycle_menu_options(choice):
         current_choice = bicycle_menu()
         bicycle_menu_options(current_choice)
 
-
 b1 = Bicycle("A", 20, 200)
 b2 = Bicycle("B", 14, 600)
 b3 = Bicycle("C", 9, 1500)
@@ -198,7 +195,6 @@ def shop_menu_options(choice):
     else:
         current_choice = shop_menu()
         shop_menu_options(current_choice)
-
 
 bs1 = Bike_Shop("Bob's Bikes", 10)
 bs2 = Bike_Shop("Fixies", 7)
@@ -280,9 +276,13 @@ def customer_menu_options(choice):
 
 c1 = Customer("Kelsey Ryan", 300)
 c2 = Customer("Max Frost", 220)
+c3 = Customer("Sally May", 3000)
+c4 = Customer("Freddie Mac", 1000)
 customers_list = {
     "Kelsey Ryan": c1,
     "Max Frost": c2,
+    "Sally May": c3,
+    "Freddie Mac": c4,
 } #List of existing customers
 def show_customer_list():
     if customers_list:
@@ -303,14 +303,12 @@ def shopping():
     shopper = identify_shopper()
     money_left = customers_list[shopper.name].check_fund()
     print("Which shop would you like to visit today?")
-    purchase_info = choose_shop(money_left)
-    shop = purchase_info[0]
-    money_left = purchase_info[1]
+    shop = choose_shop(money_left)
     purchase(shopper, shop, money_left)
     current_choice = shopping_menu()
     shopping_menu_options(current_choice)
 
-current_shopper = [] #stores the name of the current shopper
+current_shopper = [] #stores the current shopper
 def identify_shopper():
     shopper_name = input("Welcome! What is your name? ")
     if shopper_name in customers_list:
@@ -324,9 +322,10 @@ def identify_shopper():
         current_shopper.append(shopper)
     return shopper
 
-current_shop = [] #stores the name of the current shop
+current_shop = [] #stores the current shop
 def choose_shop(money_left):
     show_bike_shop_list()
+    print()
     shop_number = int(input("Please select the number of the shop you would like to visit: "))
     shop_index = shop_number - 1
     while shop_index < 0 or shop_index > len(bike_shop_list):
@@ -336,8 +335,7 @@ def choose_shop(money_left):
     current_shop.append(shop_to_visit)
     print("Welcome to {}.".format(shop_to_visit.name))
     check_affordable_inventory(money_left, shop_to_visit)
-    purchase_info = [shop_to_visit, money_left]
-    return purchase_info
+    return shop_to_visit
 
 def check_affordable_inventory(fund, shop):
         '''Displays all the bicycles in the store's inventory that a customer can afford given their funds'''
@@ -345,13 +343,28 @@ def check_affordable_inventory(fund, shop):
         for current_bike, number in shop.inventory.items():
             for i in range(len(bicycle_list)):
                 bike_to_price = bicycle_list[i]
-                if shop.price(bike_to_price) < fund:
-                    print("Model {}: {} units".format(current_bike, number))
-                    print("Price: {}".format(shop.price(bike_to_price)))
-                    purchasable_bikes += 1
+                if bike_to_price.name == current_bike:
+                    if shop.price(bike_to_price) < fund:
+                        print("Model {}: {} units".format(current_bike, number))
+                        print("Price: ${}".format(shop.price(bike_to_price)))
+                        purchasable_bikes += 1
         if purchasable_bikes == 0:
-            print("Sorry, the bicycles for sale at this shop exceed your budget. Please come again.")
-            shopping_menu()
+            print("Sorry, the bicycles for sale at this shop exceed your budget.")
+            current_choice = shopping_menu()
+            shopping_menu_options(current_choice)
+
+def purchase(shopper, shop, money_left):
+    model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: ")
+    for bicycle in bicycle_list:
+        if model_to_purchase == bicycle.name:
+            bike_to_purchase = bicycle
+    shop.remove_from_inventory(bike_to_purchase)
+    shop.calculate_profit(bike_to_purchase)
+    shopper.purchase_bike(bike_to_purchase)
+    print("Bike model {} successfully purchased.".format(bike_to_purchase.name))
+    shopper.calculate_fund(shop, bike_to_purchase)
+    shopper.check_fund()
+    shop.check_profit()
 
 def shopping_menu():
     print()
@@ -364,40 +377,19 @@ def shopping_menu():
 
 def shopping_menu_options(choice):
     if (choice == "1"):
-        purchase_info = choose_shop()
         shopper = current_shopper[0]
-        shop = purchase_info[0]
-        money_left = purchase_info[1]
-        check_affordable_inventory(money_left, shop)
+        money_left = customers_list[shopper.name].check_fund()
+        print("Which shop would you like to visit today?")
+        shop = choose_shop(money_left)
         purchase(shopper, shop, money_left)
         current_choice = shopping_menu()
         shopping_menu_options(current_choice)
     elif (choice == "2"):
-        leave_shops()
         current_choice = main_menu()
         main_menu_options(current_choice)
     else:
         current_choice = shopping_menu()
         shopping_menu_options(current_choice)
-
-
-def purchase(shopper, shop, money_left):
-
-    model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: ")
-    for bicycle in bicycle_list:
-        if model_to_purchase == bicycle.name:
-            bike_to_purchase = bicycle
-    shop.remove_from_inventory(bike_to_purchase)
-    shop.calculate_profit(bike_to_purchase)
-    shopper.purchase_bike(bike_to_purchase)
-    print("Bike model {} successfully purchased.".format(bike_to_purchase.name))
-    shopper.calculate_fund(shop, bike_to_purchase)
-    shopper.check_fund()
-
-def leave_shops():
-    shop = current_shop[0]
-    shop.check_profit()
-
 
 
 if __name__ == '__main__':
