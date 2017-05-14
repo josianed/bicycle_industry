@@ -4,10 +4,6 @@ class Bicycle(object):
         self.weight = weight
         self.production_cost = production_cost
 
-    def see_bike(self):
-        ''' Displays a bike's attributes'''
-        print("Model {} weighs {} lbs and costs ${} to produce.".format(self.name, self.weight, self.production_cost))
-
 class Bike_Shop(object):
     def __init__(self, name, margin):
         self.name = name
@@ -19,10 +15,6 @@ class Bike_Shop(object):
     def save_shop(Bike_Shop):
         '''Saves newly created shop to the shop list'''
         shop_list.append(Bike_Shop)
-
-    def see_shops(self):
-        '''Displays all shops that were opened'''
-        print("{} has a margin of {}%.".format(self.name, self.margin * 100))
 
     # store_inventory = {} #list of stock available (models + amount)
     def add_to_inventory(self, Bicycle, amount):

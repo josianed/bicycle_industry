@@ -72,8 +72,8 @@ def show_bicycle_list():
         print("Current bicycle models: ")
         print()
         for position, bicycle in enumerate(bicycle_list):
-            print("[{}]".format(position + 1))
-            bicycle.see_bike()
+            position = position + 1
+            print("[{}] Model {} weighs {} lbs and costs ${} to produce.".format(position, bicycle.name, bicycle.weight, bicycle.production_cost))
             print()
     else:
         print("There are currently no bicycles available to view. Please visit manufacturer to place your orders.")
@@ -147,8 +147,8 @@ def show_bike_shop_list():
         print("Current bike shops in your area: ")
         print()
         for position, shop in enumerate(bike_shop_list):
-            print("[{}]".format(position + 1))
-            shop.see_shops()
+            position = position + 1
+            print("[{}] {}".format(position, shop.name))
     else:
         print("There are currently no bike shops in your area.")
 
@@ -345,23 +345,18 @@ def check_affordable_inventory(fund, shop):
             shopping_menu_options(current_choice)
 
 def purchase(shopper, shop, money_left):
-    try:
+    bike_to_purchase = None
+    while not bike_to_purchase:
         model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: Model ")
         for bicycle in bicycle_list:
             if model_to_purchase == bicycle.name:
                 bike_to_purchase = bicycle
-        shop.remove_from_inventory(bike_to_purchase)
-        shop.calculate_profit(bike_to_purchase)
-        shopper.purchase_bike(bike_to_purchase)
-    except:
-        print("Whoopsies! I don't recognize that model name. Please try typing it again: ")
-        model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: Model ")
-        for bicycle in bicycle_list:
-            if model_to_purchase == bicycle.name:
-                bike_to_purchase = bicycle
-        shop.remove_from_inventory(bike_to_purchase)
-        shop.calculate_profit(bike_to_purchase)
-        shopper.purchase_bike(bike_to_purchase)
+        if not bike_to_purchase:
+            print("Whoopsies! I don't recognize that model name. Please try typing it again: ")
+            bike_to_purchase = None
+    shop.remove_from_inventory(bike_to_purchase)
+    shop.calculate_profit(bike_to_purchase)
+    shopper.purchase_bike(bike_to_purchase)
     print("Bike model {} successfully purchased.".format(bike_to_purchase.name))
     shopper.calculate_fund(shop, bike_to_purchase)
     shopper.check_fund()
