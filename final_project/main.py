@@ -34,7 +34,8 @@ def main_menu_options(choice):
         print("Thanks for stopping by. Goodbye!")
         sys.exit()
     else:
-        main_menu()
+        current_choice = main_menu()
+        main_menu_options(current_choice)
 
 def bicycle_menu():
     print()
@@ -79,8 +80,25 @@ def show_bicycle_list():
 
 def create_new_bicycle():
     model_name = input("Please enter the new bicycle model's name: ")
-    model_weight = input("Please enter the new bicycle's weight: ")
-    prod_cost = int(input("Please enter the new bicycle's production cost: "))
+    model_weight = None
+    while not model_weight:
+        try:
+            model_weight = int(input("Please enter the new bicycle's weight: "))
+            if model_weight < 5 or model_weight > 30:
+                print("Please enter a valid weight between 5lbs and 30lbs.")
+                model_weight = None
+        except ValueError:
+            print("Please enter a number.")
+    prod_cost = None
+    while not prod_cost:
+        try:
+            prod_cost = int(input("Please enter the new bicycle's production cost: "))
+            if prod_cost < 50 or prod_cost > 10000:
+                print("Please enter a valid production cost between $50 and $10,000.")
+                prod_cost = None
+        except ValueError:
+            print("Please enter a number.")
+
     new_bike = Bicycle(model_name, model_weight, prod_cost)
     bicycle_list.append(new_bike)
     print("New bicycle model {} successfully created.".format(model_name))
@@ -135,8 +153,21 @@ def show_bike_shop_list():
         print("There are currently no bike shops in your area.")
 
 def create_new_bike_shop():
-    shop_name = input("Please enter the new bike shop's name: ")
-    margin = int(input("Please enter your shop's margin in %: "))
+    shop_name = None
+    while not shop_name:
+        shop_name = input("Please enter the new bike shop's name: ")
+        if len(shop_name) < 3 or len(shop_name) > 70:
+            print("Please enter a valid shop name with 3 to 70 characters")
+            shop_name = None
+    margin = None
+    while not margin:
+        try:
+            margin = int(input("Please enter your shop's margin in %: "))
+            if margin < 5 or margin > 70:
+                print("Please enter a valid margin between 5% and 70%")
+                margin = None
+        except ValueError:
+            print("Please enter a number.")
     new_shop = Bike_Shop(shop_name, margin)
     bike_shop_list.append(new_shop)
     print("New bike shop {} successfully created.".format(shop_name))
@@ -153,12 +184,31 @@ def create_new_bike_shop():
 def add_inventory(new_shop):
     print("Place your order.")
     show_bicycle_list()
-    model_number = int(input("Please select the number of the model you would like to stock: "))
+    model_number = None
+    while not model_number:
+        try:
+            model_number = int(input("Please select the number of the model you would like to stock: "))
+        except ValueError:
+            print("Please enter a number.")
+            model_number = None
     model_index = model_number - 1
     while model_index < 0 or model_index > len(bicycle_list):
         model_number = int(input("Please select the number of the model you would like to stock: "))
         model_index = model_number - 1
-    amount = int(input("How many would you like to purchase for your inventory? "))
+    amount = None
+    while not amount:
+        try:
+            amount = int(input("How many would you like to purchase for your inventory? "))
+            if amount < 0 or amount > 200:
+                if amount < 0:
+                    print("Please enter a number larger or equal to 0.")
+                    amount = None
+                else:
+                    print("Are you sure you want that many?")
+                    amount = None
+        except ValueError:
+            print("Please enter a number.")
+            amount = None
     new_shop.add_to_inventory(bicycle_list[model_index], amount)
     print("Successfully purchased {} bicycles of model {} for ${} each".format(amount, bicycle_list[model_index].name, bicycle_list[model_index].production_cost))
     print("Current inventory: ")
@@ -211,11 +261,29 @@ def show_customer_list():
         print("No one in this area has shopped for bicycles before.")
 
 def greet_customer():
-    new_customer_name = input("Let's add you to the database. What is your full name? ")
-    budget = int(input("What is your budget? "))
+    new_customer_name = None
+    while not new_customer_name:
+        new_customer_name = input("Let's add you to the database. What is your full name? ")
+        if len(new_customer_name) < 5 or not new_customer_name.isalpha():
+            print("Please enter a valid name without symbols or numbers, with at least 5 letters.")
+            new_customer_name = None
+    budget = None
+    while not budget:
+        try:
+            budget = int(input("What is your budget? "))
+            if budget < 50 or budget > 20000:
+                if budget < 50:
+                    print("You're going to need a bit more money than that for a new bicycle.")
+                    budget = None
+                else:
+                    print("You might want to put a downpayment on a house with that kind of money instead of blowing it on bikes.")
+                    budget = None
+        except ValueError:
+            print("Please enter a number.")
     new_customer = Customer(new_customer_name, budget)
-    customers_list[new_customer_name] = new_customer
+    customers_list[new_customer.name] = new_customer
     print("New customer {} successfully added.".format(new_customer_name))
+    return new_customer.name
 
 def shopping():
     shopper = identify_shopper()
@@ -235,7 +303,7 @@ def identify_shopper():
         current_shopper[0] = shopper
     else:
         print("Looks like it's your first time visiting us.")
-        greet_customer()
+        shopper_name = greet_customer()
         shopper = customers_list[shopper_name]
         current_shopper[0] = shopper
     return shopper
@@ -244,7 +312,12 @@ current_shop = ["shop"] #stores the current shop
 def choose_shop(money_left):
     show_bike_shop_list()
     print()
-    shop_number = int(input("Please select the number of the shop you would like to visit: "))
+    shop_number = None
+    while not shop_number:
+        try:
+            shop_number = int(input("Please select the number of the shop you would like to visit: "))
+        except ValueError:
+            print("Please enter a number.")
     shop_index = shop_number - 1
     while shop_index < 0 or shop_index > len(bike_shop_list):
         shop_number = int(input("Please select the number of the shop you would like to visit: "))
@@ -272,13 +345,23 @@ def check_affordable_inventory(fund, shop):
             shopping_menu_options(current_choice)
 
 def purchase(shopper, shop, money_left):
-    model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: ")
-    for bicycle in bicycle_list:
-        if model_to_purchase == bicycle.name:
-            bike_to_purchase = bicycle
-    shop.remove_from_inventory(bike_to_purchase)
-    shop.calculate_profit(bike_to_purchase)
-    shopper.purchase_bike(bike_to_purchase)
+    try:
+        model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: Model ")
+        for bicycle in bicycle_list:
+            if model_to_purchase == bicycle.name:
+                bike_to_purchase = bicycle
+        shop.remove_from_inventory(bike_to_purchase)
+        shop.calculate_profit(bike_to_purchase)
+        shopper.purchase_bike(bike_to_purchase)
+    except:
+        print("Whoopsies! I don't recognize that model name. Please try typing it again: ")
+        model_to_purchase = input("Please enter the name of the bicycle model you would like to purchase: Model ")
+        for bicycle in bicycle_list:
+            if model_to_purchase == bicycle.name:
+                bike_to_purchase = bicycle
+        shop.remove_from_inventory(bike_to_purchase)
+        shop.calculate_profit(bike_to_purchase)
+        shopper.purchase_bike(bike_to_purchase)
     print("Bike model {} successfully purchased.".format(bike_to_purchase.name))
     shopper.calculate_fund(shop, bike_to_purchase)
     shopper.check_fund()
