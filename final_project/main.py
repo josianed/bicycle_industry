@@ -133,7 +133,7 @@ bs1 = Bike_Shop("Bob's Bikes", 20)
 bs2 = Bike_Shop("Fixies", 15)
 bs3 = Bike_Shop("Speed Supreme", 30)
 bs4 = Bike_Shop("Spokes & Wheels", 25)
-bike_shop_list = [bs1, bs2, bs3] #list of bicycles created by user
+bike_shop_list = [bs1, bs2, bs3]
 def show_bike_shop_list():
     bs1.add_to_inventory(b1, 5)
     bs1.add_to_inventory(b2, 5)
@@ -146,8 +146,7 @@ def show_bike_shop_list():
         print()
         print("Current bike shops in your area: ")
         print()
-        for position, shop in enumerate(bike_shop_list):
-            position = position + 1
+        for position, shop in enumerate(bike_shop_list, 1):
             print("[{}] {}".format(position, shop.name))
     else:
         print("There are currently no bike shops in your area.")
@@ -264,8 +263,8 @@ def greet_customer():
     new_customer_name = None
     while not new_customer_name:
         new_customer_name = input("Let's add you to the database. What is your full name? ")
-        if len(new_customer_name) < 5 or not new_customer_name.isalpha():
-            print("Please enter a valid name without symbols or numbers, with at least 5 letters.")
+        if not new_customer_name):
+            print("Please enter a valid name with at least one character.")
             new_customer_name = None
     budget = None
     while not budget:
@@ -333,6 +332,7 @@ def check_affordable_inventory(fund, shop):
         purchasable_bikes = 0
         for current_bike, number in shop.inventory.items():
             for i in range(len(bicycle_list)):
+                # for bike_to_price in bicycle_list:
                 bike_to_price = bicycle_list[i]
                 if bike_to_price.name == current_bike:
                     if shop.price(bike_to_price) < fund:

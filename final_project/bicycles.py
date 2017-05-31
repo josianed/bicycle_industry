@@ -57,7 +57,7 @@ class Customer(object):
         '''Displays a list of bikes that the customer owns'''
         for bike in self.bikes:
             print("You currently own the following bicycles: ")
-            print("Model {}".format(bike.name, sep=", "))
+            print("Model {}".format(bike.name))
 
     def calculate_fund(self, Bike_Shop, Bicycle):
         '''Calculates remaining money in fund after a bicycle is purchased'''
@@ -66,7 +66,7 @@ class Customer(object):
         self.fund -= current_purchase
 
     def check_fund(self):
-        '''Display's the customer's current remaining fund'''
+        '''Displays the customer's current remaining fund'''
         print("Your remaining fund is ${}".format(self.fund))
         return self.fund
 
